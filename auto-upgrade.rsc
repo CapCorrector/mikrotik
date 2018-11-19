@@ -7,6 +7,7 @@
 ##   created: 2014-12-05
 ##   updated: 2015-12-09
 ##   tested on: RouterOS 6.33.1 / multiple HW devices, won't work on 6.27 and older (different update process & value naming)
+##   modifien 2018-11-19
 ##
 
 
@@ -14,6 +15,7 @@
 
 ## Notification e-mail
 :local email "your@email.com"
+:local toemail true
 ## Update channel can take values: bugfix | current | development | release-candidate
 :global updChannel "current"
 
@@ -32,7 +34,7 @@ check-for-updates
 :if ([get installed-version] != [get latest-version]) do={
 
    ## New version of RouterOS available, let's upgrade
-   /tool e-mail send to="$email" subject="Upgrading RouterOS on router $[/system identity get name]" body="Upgrading RouterOS on router $[/system identity get name] from $[/system package update get installed-version] to $[/system package update get latest-version] (channel:$[/system package update get channel])"
+   :if ($toemail = true) do={ /tool e-mail send to="$email" subject="Upgrading RouterOS on router $[/system identity get name]" body="Upgrading RouterOS on router $[/system identity get name] from $[/system package update get installed-version] to $[/system package update get latest-version] (channel:$[/system package update get channel])" }
    :log info ("Upgrading RouterOS on router $[/system identity get name] from $[/system package update get installed-version] to $[/system package update get latest-version] (channel:$[/system package update get channel])")
 
    ## Wait for mail to be send & upgrade
@@ -51,7 +53,7 @@ check-for-updates
    :if ( [get current-firmware] != [get upgrade-firmware]) do={
 
       ## New version of firmware available, let's upgrade
-      /tool e-mail send to="$email" subject="Upgrading firmware on router $[/system identity get name]" body="Upgrading firmware on router $[/system identity get name] from $[/system routerboard get current-firmware] to $[/system routerboard get upgrade-firmware]"
+      :if ($toemail = true) do={ /tool e-mail send to="$email" subject="Upgrading firmware on router $[/system identity get name]" body="Upgrading firmware on router $[/system identity get name] from $[/system routerboard get current-firmware] to $[/system routerboard get upgrade-firmware]" }
       :log info ("Upgrading firmware on router $[/system identity get name] from $[/system routerboard get current-firmware] to $[/system routerboard get upgrade-firmware]")
 
       ## Wait for mail to be send & upgrade
